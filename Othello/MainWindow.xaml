@@ -1,0 +1,132 @@
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:UniformBoard="clr-namespace:Othello.UniformBoard" xmlns:ViewModel="clr-namespace:Othello.ViewModel" xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity" xmlns:ei="http://schemas.microsoft.com/expression/2010/interactions" xmlns:Custom="http://www.galasoft.ch/mvvmlight" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:View="clr-namespace:Othello.View" xmlns:Converters="clr-namespace:Othello.View.Converters" mc:Ignorable="d" 
+        x:Class="Othello.MainWindow"
+        Title="Othello" Height="441" Width="753"
+        WindowState="Maximized">
+    <Window.Resources>
+        <Converters:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+        <Style x:Key="ListBoxItemStyle" TargetType="{x:Type ListBoxItem}">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="UniformBoard:UniformBoard.Row" Value="{Binding X}"/>
+            <Setter Property="UniformBoard:UniformBoard.Column" Value="{Binding Y}"/>
+            <Setter Property="HorizontalContentAlignment" Value="{Binding HorizontalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="VerticalContentAlignment" Value="{Binding VerticalContentAlignment, RelativeSource={RelativeSource AncestorType={x:Type ItemsControl}}}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <DataTemplate DataType="{x:Type ViewModel:CellViewModel}">
+            <View:TileControl DataContext="{Binding}"/>
+        </DataTemplate>
+    </Window.Resources>
+    <Window.DataContext>
+        <Binding Path="Main" Source="{StaticResource Locator}"/>
+    </Window.DataContext>
+    <DockPanel>
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="PlayTurnStates">
+                <VisualState x:Name="NonePlaying"/>
+                <VisualState x:Name="PlayingBlack">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ellipseblackturn">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                            <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
+                        </DoubleAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)" Storyboard.TargetName="ellipseblackturn">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                            <EasingDoubleKeyFrame KeyTime="0:0:1" Value="38"/>
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+                <VisualState x:Name="PlayingWhite">
+                    <Storyboard>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Opacity)" Storyboard.TargetName="ellipsewhiteturn">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="1"/>
+                            <EasingDoubleKeyFrame KeyTime="0:0:1" Value="1"/>
+                        </DoubleAnimationUsingKeyFrames>
+                        <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.RenderTransform).(TransformGroup.Children)[3].(TranslateTransform.X)" Storyboard.TargetName="ellipsewhiteturn">
+                            <EasingDoubleKeyFrame KeyTime="0" Value="0"/>
+                            <EasingDoubleKeyFrame KeyTime="0:0:1" Value="-38"/>
+                        </DoubleAnimationUsingKeyFrames>
+                    </Storyboard>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="File">
+                <MenuItem Header="Exit" Command="{Binding ExitCommand}"/>
+            </MenuItem>
+        </Menu>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="{Binding CurrentState}"/>
+        </StatusBar>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition Width="331" />
+            </Grid.ColumnDefinitions>
+            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" Grid.Column="2" CornerRadius="4"/>
+            <Border BorderBrush="{DynamicResource BorderBrush}" BorderThickness="1" CornerRadius="4"/>
+            <Grid HorizontalAlignment="Center" VerticalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Row="0" Grid.Column="0" Name="BlackPlayerPanel" Background="LightGreen">
+                    <StackPanel Name="BlackMoves" Orientation="Vertical" Width="80" Margin="0 10 0 0">
+                    </StackPanel>
+                    <Image x:Name="BlackStackPic" Margin="0 20 0 0" Height="112.5" Width="112.5" Stretch="Uniform" Source="C:\\png/black.png" Visibility="Visible"/>
+                    <TextBox Name="BlackTotalCount" Text="40" Width="40" Margin="0, 5, 0,0" BorderThickness="2" BorderBrush="Black"></TextBox>
+                </StackPanel>
+                <ListBox x:Name="listBox" Width="{Binding ActualHeight, ElementName=listBox, Mode=OneWay}" ItemContainerStyle="{DynamicResource ListBoxItemStyle}" ItemsSource="{Binding Board.Cells}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollBarVisibility="Disabled" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Stretch" Background="{x:Null}" d:LayoutOverrides="Height" Grid.Row="0" Grid.Column="1" Grid.RowSpan="8" Grid.ColumnSpan="8" >
+                    <ListBox.Style>
+                        <Style TargetType="{x:Type ListBox}">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ListBox}">
+                                        <UniformBoard:UniformBoard Rows="8" Columns="8" IsItemsHost="True" Animate="False" Background="{StaticResource BoardBackGroundBrush}"/>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.Style>
+                </ListBox>
+                <StackPanel Grid.Row="0" Grid.Column="2" Name="WhitePlayerPanel" Background="LightGreen" Margin="800, 0, 0, 0">
+                    <StackPanel Name="WhiteMoves" Orientation="Vertical" VerticalAlignment="Top" Width="80" Margin="0 10 0 0">
+                    </StackPanel>
+                    <Image Height="112.5" Margin="0 20 0 0" Width="112.5" Stretch="Uniform" Source="C:\\png/white.png" Visibility="Visible"/>
+                    <TextBox Name="WhiteTotalCount" Text="40" Width="40" Margin="0, 5, 0,0" BorderThickness="2" BorderBrush="Black"></TextBox>
+                </StackPanel>
+            </Grid>
+            <WrapPanel Grid.Column="1" Margin="9,24,136,0">
+                <Image HorizontalAlignment="Left" Margin="15,29,0,0" VerticalAlignment="Top" Source="C:\\png/title.png"  Visibility="Visible"/>
+                <Button Name="btnBegin" Content="BEGIN" Width="70" Margin="10, 0, 0,0" Command="{Binding StartPlayCommand, Mode=OneWay}"/>
+                <Button Content="RESET" Width="70" Margin="20, 0, 0,0" Click="Reset_Game"/>
+                <Button Name ="btnUndo" Content="UNDO" Width="70" Margin="10, 10, 0,0" Click="Undo_Click"/>
+                <Button Name="btnHint" Content="ENABLE HINT" Width="79" Margin="20, 10, 0,0" Click="Button_Click"/>
+                <Button Name ="btnSaveGame" Content="SAVE" Width="70" Margin="10, 10, 0,0" Click="Save_Data"/>
+                <Button Name ="btnLoadGame" Content="LOAD GAME"  Margin="20, 10, 0,0" Width="80" Click="Load_Data"/>
+                <Button Name ="btnNewGame" Content="NEW GAME"  Margin="10, 10, 0,0" Width="70" Click="New_Game"/>
+                <Label Content="CURRENT PLAYER" Width="160" Margin="10, 10, 0,0" HorizontalContentAlignment="Center" BorderThickness="2" Background="LightGray" Foreground="Brown"/>
+                <Image x:Name="BlackPlayerPic" Height="80" Width="80" Stretch="Uniform" Margin="10, 10, 0,0" Source="C:\\png/turn_black.png" Visibility="Visible"/>
+                <Image x:Name="WhitePlayerPic" Height="80" Width="80" Stretch="Uniform" Source="C:\\png/white_noback.png" Visibility="Visible"/>
+                <Label Content="PLAYER A" Width="80" Margin="10, 10, 0,0" Background="LightGray" HorizontalContentAlignment="Center"/>
+                <Label Content="PLAYER B" Width="80" Margin="10, 10, 0,0" Background="LightGray" HorizontalContentAlignment="Center"/>
+                <TextBox Name="NamePlayerA" Text="TYPE IN YOUR NAME HERE" TextChanged="PlayerA_NameChanged" Foreground="Red" TextWrapping="Wrap" FontSize="10" Width="80"  Height="40" Margin="10, 10, 0,0"></TextBox>
+                <TextBox Name="NamePlayerB" Text="TYPE IN YOUR NAME HERE" TextChanged="PlayerB_NameChanged" Foreground="Red" TextWrapping="Wrap" FontSize="10" Width="80" Height="40" Margin="10, 10, 0,0"></TextBox>
+                <Label Content="SCORE CARD" Width="180" Margin="5, 5, 0,0" Background="LightGray" Foreground="Brown" HorizontalContentAlignment="Center"/>
+                <Label Content="Player A Count:" Width="120" Margin="0, 5, 0,0"/>
+                <TextBox Name="PlayerACount" Width="50" Margin="0, 5, 0,0" BorderThickness="2" BorderBrush="Black"></TextBox>
+                <Label Content="Player B Count:" Width="120" Margin="0, 5, 0,0"/>
+                <TextBox Name="PlayerBCount" Width="50" Margin="0, 5, 0,0" BorderThickness="2" BorderBrush="Black"></TextBox>
+                <View:PlayTurnChangeControl x:Name="turnControl" Visibility="Hidden"/>
+            </WrapPanel>
+        </Grid>
+    </DockPanel>
+</Window>
