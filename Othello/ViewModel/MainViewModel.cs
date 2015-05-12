@@ -49,6 +49,18 @@ namespace Othello.ViewModel
 
         #region Properties
 
+        public MainWindow MainWindow
+        {
+            get
+            {
+                if (_mainWindow == null)
+                {
+                    _mainWindow = Application.Current.MainWindow as MainWindow;
+                }
+                return _mainWindow;
+            }
+        }
+
         #region IsManualFlipEnabled
 
         private bool _isManualFlipEnabled;
@@ -794,11 +806,7 @@ namespace Othello.ViewModel
                 WhiteCount = Board.Board.WhitePoints.Count;
                 BlackCount = Board.Board.BlackPoints.Count;
 
-                if (_mainWindow == null)
-                {
-                    _mainWindow = Application.Current.MainWindow as MainWindow;
-                }
-                _mainWindow.UpdateScore(WhiteCount, BlackCount, PlayerThatPlayNow.PlayerKind, moveEventArgs.IsUndoneMove);
+                MainWindow.UpdateScore(WhiteCount, BlackCount, PlayerThatPlayNow.PlayerKind, moveEventArgs.IsUndoneMove);
                 var seconds = (DateTime.Now - LastTimeMoved).TotalSeconds;
                 LastTimeMoved = DateTime.Now;
                 if (PlayerThatPlayNow.PlayerKind == PlayerKind.Black)
@@ -945,7 +953,7 @@ namespace Othello.ViewModel
                 Board.FlipCellManually(cell);
                 WhiteCount = Board.Board.WhitePoints.Count;
                 BlackCount = Board.Board.BlackPoints.Count;
-                _mainWindow.UpdateScore(WhiteCount, BlackCount);
+                MainWindow.UpdateScore(WhiteCount, BlackCount);
             }
         }
 
