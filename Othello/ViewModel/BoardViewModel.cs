@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using GalaSoft.MvvmLight;
 using Othello.Logic.Classes;
+using Othello.Logic.Common;
 using Othello.Logic.Interfaces;
 
 namespace Othello.ViewModel
@@ -157,23 +158,34 @@ namespace Othello.ViewModel
             {
                 return;
             }
-            BoardOfCellViewModel[move.MovePosition.Item1, move.MovePosition.Item2].CellState =
-                    Logic.Common.CellState.Empty;
-            if (move.Player.PlayerKind == Logic.Common.PlayerKind.Black)
+            BoardOfCellViewModel[move.MovePosition.Item1, move.MovePosition.Item2].CellState = CellState.Empty;
+            if (move.Player.PlayerKind == PlayerKind.Black)
             {
                 foreach (var convertedPoint in move.ConvertedPoints)
                 {
-                    BoardOfCellViewModel[convertedPoint.Item1, convertedPoint.Item2].CellState =
-                        Logic.Common.CellState.White;
+                    BoardOfCellViewModel[convertedPoint.Item1, convertedPoint.Item2].CellState = CellState.White;
                 }
             }
             else
             {
                 foreach (var convertedPoint in move.ConvertedPoints)
                 {
-                    BoardOfCellViewModel[convertedPoint.Item1, convertedPoint.Item2].CellState =
-                        Logic.Common.CellState.Black;
+                    BoardOfCellViewModel[convertedPoint.Item1, convertedPoint.Item2].CellState = CellState.Black;
                 }
+            }
+        }
+
+        public bool CanFlipCellManualy(CellViewModel cell)
+        {
+            return cell != null && cell.CellState != CellState.Empty;
+        }
+
+        public void FlipCellManually(CellViewModel cell)
+        {
+            if (cell != null && cell.CellState != CellState.Empty)
+            {
+                Board.FlipCellManually(cell.X, cell.Y);
+                cell.CellState = cell.CellState == CellState.White ? CellState.Black : CellState.White;
             }
         }
 

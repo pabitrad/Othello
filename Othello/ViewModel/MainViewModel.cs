@@ -49,6 +49,22 @@ namespace Othello.ViewModel
 
         #region Properties
 
+        #region IsManualFlipEnabled
+
+        private bool _isManualFlipEnabled;
+
+        public bool IsManualFlipEnabled
+        {
+            get { return _isManualFlipEnabled; }
+            set
+            {
+                _isManualFlipEnabled = value;
+                RaisePropertyChanged("IsManualFlipEnabled");
+            }
+        }
+
+        #endregion
+
         #region GameManager
 
         private IGameManager _GameManager;
@@ -904,7 +920,7 @@ namespace Othello.ViewModel
         #region HummanMove
 
         private RelayCommand<CellViewModel> _HummanMoveCommand;
-
+        
         public RelayCommand<CellViewModel> HummanMoveCommand
         {
             get { return _HummanMoveCommand ?? (_HummanMoveCommand = new RelayCommand<CellViewModel>(ExecuteHummanMoveCommand, CanExecuteHummanMoveCommand)); }
@@ -917,27 +933,42 @@ namespace Othello.ViewModel
 
         private void ExecuteHummanMoveCommand(CellViewModel cell)
         {
-            //ComandCode
-            if (IsAHummanPlayer && cell!=null)
+            if (!IsManualFlipEnabled)
             {
-                (PlayerThatPlayNow as HummanPlayer).HummanPositionToMove = new MyTuple<int, int>(cell.X, cell.Y);
+                if (IsAHummanPlayer && cell != null)
+                {
+                    (PlayerThatPlayNow as HummanPlayer).HummanPositionToMove = new MyTuple<int, int>(cell.X, cell.Y);
+                }
+            }
+            else
+            {
+                Board.FlipCellManually(cell);
+                WhiteCount = Board.Board.WhitePoints.Count;
+                BlackCount = Board.Board.BlackPoints.Count;
+                _mainWindow.UpdateScore(WhiteCount, BlackCount);
             }
         }
 
         private bool CanExecuteHummanMoveCommand(CellViewModel cell)
         {
-            IEnumerable<IMove> possibleMoves = Board.Board.GetPlausibleMoves(PlayerThatPlayNow);
-
-            foreach (Move move in possibleMoves)
+            if (!IsManualFlipEnabled)
             {
-                if (move.MovePosition.Item1 == cell.X && move.MovePosition.Item2 == cell.Y)
+                IEnumerable<IMove> possibleMoves = Board.Board.GetPlausibleMoves(PlayerThatPlayNow);
+
+                foreach (Move move in possibleMoves)
                 {
-                    return true;
+                    if (move.MovePosition.Item1 == cell.X && move.MovePosition.Item2 == cell.Y)
+                    {
+                        return true;
+                    }
                 }
+            }
+            else if (Board.CanFlipCellManualy(cell))
+            {
+                return true;
             }
 
             MessageBox.Show("Illegal Move");
-
             return false;
         }
 

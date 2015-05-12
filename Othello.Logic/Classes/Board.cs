@@ -102,6 +102,27 @@ namespace Othello.Logic.Classes
             }
         }
 
+        public void FlipCellManually(int cellX, int cellY)
+        {
+            CellState cellState = Positions[cellX, cellY];
+            if (cellState == CellState.Empty)
+            {
+                return;
+            }
+            if (cellState == CellState.White)
+            {
+                WhitePoints.Remove(new MyTuple<int, int>(cellX, cellY));
+                BlackPoints.Add(new MyTuple<int, int>(cellX, cellY));
+                Positions[cellX, cellY] = CellState.Black;
+            }
+            else
+            {
+                BlackPoints.Remove(new MyTuple<int, int>(cellX, cellY));
+                WhitePoints.Add(new MyTuple<int, int>(cellX, cellY));
+                Positions[cellX, cellY] = CellState.White;
+            }
+        }
+
         public IEnumerable<IMove> GetPlausibleMoves(IPlayer player)
         {
             var toRet = new List<IMove>();

@@ -137,6 +137,12 @@ namespace Othello
             BlackTotalCount.Text = BlackMoves.Children.Count.ToString();
         }
 
+        public void UpdateScore(int whiteCount, int blackCount)
+        {
+            PlayerACount.Text = blackCount.ToString();
+            PlayerBCount.Text = whiteCount.ToString(); 
+        }
+
         public void UpdateScore(int whiteCount, int blackCount, PlayerKind playerKind, bool isUndoneMove)
         {
             PlayerACount.Text = blackCount.ToString();
@@ -359,6 +365,18 @@ namespace Othello
         private void Load_Data(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void HandleManualFlipSwitch(object sender, RoutedEventArgs e)
+        {
+            if (btnManualFlip.IsChecked.HasValue && btnManualFlip.IsChecked.Value)
+            {
+                btnManualFlip.Content = "Manual Flip Off";
+            }
+            else
+            {
+                btnManualFlip.Content = "Manual Flip On";
+            }
         }
     }
 }

@@ -18,5 +18,6 @@ namespace Othello.Logic.Interfaces
         IList<MyTuple<int, int>> BlackPoints { get; set; }
         bool IsFrontier(int i, int j);
         bool IsUnFlankeable(int i, int j);
+        void FlipCellManually(int cellX, int cellY);
     }
 }
