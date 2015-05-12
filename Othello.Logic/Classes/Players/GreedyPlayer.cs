@@ -47,6 +47,11 @@ namespace Othello.Logic.Classes.Players
             return moveList[rndIndex];
         }
 
+        public override void CancelNextMove()
+        {
+            /*DO NOTHING*/
+        }
+
         protected override IComparer<IMove> MoveComparer { get; set; }
         protected override int Utility(IBoard board)
         {

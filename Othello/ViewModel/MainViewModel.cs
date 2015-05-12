@@ -745,51 +745,65 @@ namespace Othello.ViewModel
 
         private void GameManagerOnMoveDone(object sender, MoveEventArgs moveEventArgs)
         {
-            SyncContext.Send((_) =>
-                                 {
-                                     if (!IsPlaying)
-                                         return;
-                                     MovesCount++;
-                                     MovesString = string.Format("{0}\n{1}.{2}-{3}", MovesString, MovesCount.ToString("00"),
-                                                                 PlayerThatPlayNow.PlayerKind == PlayerKind.White
-                                                                     ? "White"
-                                                                     : "Black",
-                                                                     moveEventArgs.Move.IsPassMove ? "Pass" : string.Format("{0}{1}",
-                                                                               (char)('a' +
-                                                                                moveEventArgs.Move.MovePosition.Item2),
-                                                                               moveEventArgs.Move.MovePosition.Item1 + 1));
-                                     Board.DoMove(moveEventArgs.Move);
-                                     PlayerThatPlayNow = GameManager.CurrentPlayerAtTurn;
-                                     Board.RefreshCells();
-                                     WhiteCount = Board.Board.WhitePoints.Count;
-                                     BlackCount = Board.Board.BlackPoints.Count;
+            SyncContext.Send(_ =>
+            {
+                if (!IsPlaying)
+                    return;
 
-                                     if (_mainWindow == null)
-                                     {
-                                         _mainWindow = Application.Current.MainWindow as MainWindow;
-                                     }
-                                     _mainWindow.UpdateScore(WhiteCount, BlackCount, PlayerThatPlayNow.PlayerKind);
-                                     var seconds = (DateTime.Now - LastTimeMoved).TotalSeconds;
-                                     LastTimeMoved = DateTime.Now;
-                                     if (PlayerThatPlayNow.PlayerKind == PlayerKind.Black)
-                                     {
-                                         WhiteTimer.Stop();
-                                         BlackTimer.Start();
-                                         //While was playing
-                                         if (WhiteMaxEllapsedTime < seconds)
-                                             WhiteMaxEllapsedTime = (int)seconds;
-                                         
-                                         
-                                     }
-                                     else
-                                     {
-                                         WhiteTimer.Start();
-                                         BlackTimer.Stop();
-                                         //Black was playing
-                                         if (BlackMaxEllapsedTime < seconds)
-                                             BlackMaxEllapsedTime = (int)seconds;
-                                     }
-                                 },null);
+                if (!moveEventArgs.IsUndoneMove)
+                {
+                    MovesCount++;
+                    MovesString = string.Format("{0}\n{1}.{2}-{3}", MovesString, MovesCount.ToString("00"),
+                        PlayerThatPlayNow.PlayerKind == PlayerKind.White
+                            ? "White"
+                            : "Black",
+                        moveEventArgs.Move.IsPassMove
+                            ? "Pass"
+                            : string.Format("{0}{1}",
+                                (char) ('a' +
+                                        moveEventArgs.Move.MovePosition.Item2),
+                                moveEventArgs.Move.MovePosition.Item1 + 1));
+
+                    Board.DoMove(moveEventArgs.Move);
+                }
+                else
+                {
+                    MovesCount--;
+                    MovesString = string.Format("{0}\n{1}", MovesString, "Move was undone.");
+                    Board.ReverseMove(moveEventArgs.Move);
+                }
+
+                PlayerThatPlayNow = GameManager.CurrentPlayerAtTurn;
+                Board.RefreshCells();
+                WhiteCount = Board.Board.WhitePoints.Count;
+                BlackCount = Board.Board.BlackPoints.Count;
+
+                if (_mainWindow == null)
+                {
+                    _mainWindow = Application.Current.MainWindow as MainWindow;
+                }
+                _mainWindow.UpdateScore(WhiteCount, BlackCount, PlayerThatPlayNow.PlayerKind, moveEventArgs.IsUndoneMove);
+                var seconds = (DateTime.Now - LastTimeMoved).TotalSeconds;
+                LastTimeMoved = DateTime.Now;
+                if (PlayerThatPlayNow.PlayerKind == PlayerKind.Black)
+                {
+                    WhiteTimer.Stop();
+                    BlackTimer.Start();
+                    //While was playing
+                    if (WhiteMaxEllapsedTime < seconds)
+                        WhiteMaxEllapsedTime = (int) seconds;
+
+
+                }
+                else
+                {
+                    WhiteTimer.Start();
+                    BlackTimer.Stop();
+                    //Black was playing
+                    if (BlackMaxEllapsedTime < seconds)
+                        BlackMaxEllapsedTime = (int) seconds;
+                }
+            }, null);
         }
 
         private void PlayLogic(object sender, DoWorkEventArgs doWorkEventArgs)
@@ -898,7 +912,7 @@ namespace Othello.ViewModel
 
         public void Undo()
         {
-            _Board.ReverseMove(GameManager.LastMove);
+            _GameManager.UndoLastMove();
         }
 
         private void ExecuteHummanMoveCommand(CellViewModel cell)

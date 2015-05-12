@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Othello.Logic.Common;
+﻿using Othello.Logic.Common;
 
 namespace Othello.Logic.Interfaces
 {
@@ -12,5 +7,6 @@ namespace Othello.Logic.Interfaces
         PlayerKind PlayerKind { get; set; }
         IMove GetNextMove(IBoard board);
         string PlayerName { get; set; }
+        void CancelNextMove();
     }
 }

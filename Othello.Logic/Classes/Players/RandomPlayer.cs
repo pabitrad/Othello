@@ -29,9 +29,7 @@ namespace Othello.Logic.Classes.Players
             var rndIndex = (new Random()).Next(moveList.Count());
             return moveList[rndIndex];
         }
-
-
-
+        
         #region PlayerName
         private string _playerName = "Easy - Random";
 
@@ -39,6 +37,11 @@ namespace Othello.Logic.Classes.Players
         {
             get { return _playerName; }
             set { _playerName = value; }
+        }
+
+        public void CancelNextMove()
+        {
+            /*DO NOTHING*/
         }
 
         #endregion

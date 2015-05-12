@@ -153,9 +153,10 @@ namespace Othello.ViewModel
 
         public void ReverseMove(IMove move)
         {
-            Board.UnDoMove(move);
-            if (move.IsPassMove)
+            if (move == null || move.IsPassMove)
+            {
                 return;
+            }
             BoardOfCellViewModel[move.MovePosition.Item1, move.MovePosition.Item2].CellState =
                     Logic.Common.CellState.Empty;
             if (move.Player.PlayerKind == Logic.Common.PlayerKind.Black)

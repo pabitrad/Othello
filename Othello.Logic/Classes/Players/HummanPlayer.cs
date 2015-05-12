@@ -11,6 +11,8 @@ namespace Othello.Logic.Classes.Players
 {
     public class HummanPlayer:IPlayer
     {
+        private volatile bool _nextMoveCancelled = false;
+
         public HummanPlayer(PlayerKind playerKind)
         {
             PlayerKind = playerKind;
@@ -31,10 +33,14 @@ namespace Othello.Logic.Classes.Players
 
             //Pass of no aviable moves
             if (moves == null || !moveList.Any())
+            {
+                _nextMoveCancelled = false;
                 return new Move(true);
+            }
 
             //If human has no played
-            while(HummanPositionToMove == null || moveList.All(i => i.MovePosition != HummanPositionToMove))
+            while (_nextMoveCancelled == false &&
+                   (HummanPositionToMove == null || moveList.All(i => i.MovePosition != HummanPositionToMove)))
             {
                 //empty loop waiting for humman move
                 if (HummanPositionToMove != null && moveList.All(i => i.MovePosition != HummanPositionToMove))
@@ -42,11 +48,23 @@ namespace Othello.Logic.Classes.Players
                 Thread.Sleep(100);
             }
 
+            if (_nextMoveCancelled)
+            {
+                HummanPositionToMove = null;
+                _nextMoveCancelled = false;
+                return null;
+            }
+
             var toRet = moveList.First(i => i.MovePosition == HummanPositionToMove);
             HummanPositionToMove = null;    //reset the Human move
+            _nextMoveCancelled = false;
             return toRet;
         }
 
+        public void CancelNextMove()
+        {
+            _nextMoveCancelled = true;
+        }
 
         #region HummanPositionToMove
 

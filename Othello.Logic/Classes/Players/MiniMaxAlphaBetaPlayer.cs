@@ -118,6 +118,12 @@ namespace Othello.Logic.Classes.Players
         
         #region MiniMax-AlphaBeta-Prune
 
+        private volatile bool _nextMoveCancelled = false;
+        public override void CancelNextMove()
+        {
+            _nextMoveCancelled = true;
+        }
+
         public override IMove GetNextMove(IBoard board)
         {
             //Im the max player
@@ -131,7 +137,10 @@ namespace Othello.Logic.Classes.Players
             var possiblesMoveList = possiblesMoves as List<IMove> ?? possiblesMoves.ToList();
 
             if (possiblesMoves == null || !possiblesMoveList.Any())
+            {
+                _nextMoveCancelled = false;
                 return new Move(true);
+            }
 
             //sort to get better results
             //for improve, the first level will be sorted by board utility
@@ -190,9 +199,14 @@ namespace Othello.Logic.Classes.Players
                                       };
                 thread1.RunWorkerAsync();
                 thread2.RunWorkerAsync();
-                while(!thread1GiveResult || !thread2GiveResult) //while any of both thread working
+                while(!_nextMoveCancelled && (!thread1GiveResult || !thread2GiveResult)) //while any of both thread working
                 {
                     Thread.Sleep(200);
+                }
+                if (_nextMoveCancelled)
+                {
+                    _nextMoveCancelled = false;
+                    return null;
                 }
 
                 return thread2Result.Item1 > thread1Result.Item1 ? thread2Result.Item2 : thread1Result.Item2;
@@ -200,6 +214,7 @@ namespace Othello.Logic.Classes.Players
             else
             {
                 var result = MaxInThread(board, possiblesMoveList);
+                _nextMoveCancelled = false;
                 return result.Item2;
             }
         }

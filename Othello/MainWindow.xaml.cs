@@ -38,6 +38,8 @@ namespace Othello
         bool noAvailableMessageDisplayedForWhite = false;
         bool resultShown = false;
 
+        private PlayerKind? _lastDecrementedMoveOwnerPlayer = null;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -57,12 +59,26 @@ namespace Othello
         {
             for (int i = 0; i < MOVE_COUNT; i++)
             {
-                BlackMoves.Children.Add(new Label { BorderThickness = new Thickness(1, 1, 1, 1), BorderBrush = new SolidColorBrush(Colors.White), Height = 12, Background = new SolidColorBrush(Colors.Black) });
-                WhiteMoves.Children.Add(new Label { BorderThickness = new Thickness(1, 1, 1, 1), BorderBrush = new SolidColorBrush(Colors.Black), Height = 12, Background = new SolidColorBrush(Colors.White) });
+                addOneMove(PlayerKind.Black);
+                addOneMove(PlayerKind.White);
             }
 
             WhiteTotalCount.Text = WhiteMoves.Children.Count.ToString();
             BlackTotalCount.Text = BlackMoves.Children.Count.ToString();
+        }
+
+        private void addOneMove(PlayerKind playerKind)
+        {
+            StackPanel movesPanel = playerKind == PlayerKind.White ? WhiteMoves : BlackMoves;
+            Color borderColor = playerKind == PlayerKind.White ? Colors.Black : Colors.White;
+            Color backgroundColor = playerKind == PlayerKind.White ? Colors.White : Colors.Black;
+            movesPanel.Children.Add(new Label
+            {
+                BorderThickness = new Thickness(1, 1, 1, 1),
+                BorderBrush = new SolidColorBrush(borderColor),
+                Height = 12,
+                Background = new SolidColorBrush(backgroundColor)
+            });
         }
 
         private void SubscribeEvents()
@@ -95,7 +111,6 @@ namespace Othello
                 return false;
             }
 
-            var main = DataContext as MainViewModel;
             if (_main != null)
             {
                 _main.BlackAvailableMoves = BlackMoves.Children.Count;
@@ -105,6 +120,7 @@ namespace Othello
 
                 BlackMoves.Children.RemoveRange(0, 2);
                 WhiteMoves.Children.RemoveRange(0, 2);
+                _lastDecrementedMoveOwnerPlayer = null;
 
                 setInitialScore();
             }
@@ -121,20 +137,37 @@ namespace Othello
             BlackTotalCount.Text = BlackMoves.Children.Count.ToString();
         }
 
-        public void UpdateScore(int whiteCount, int blackCount, PlayerKind playerKind)
+        public void UpdateScore(int whiteCount, int blackCount, PlayerKind playerKind, bool isUndoneMove)
         {
             PlayerACount.Text = blackCount.ToString();
             PlayerBCount.Text = whiteCount.ToString();
 
+            if (isUndoneMove && _lastDecrementedMoveOwnerPlayer.HasValue)
+            {
+                addOneMove(_lastDecrementedMoveOwnerPlayer.Value);
+                if (_lastDecrementedMoveOwnerPlayer.Value == PlayerKind.White)
+                {
+                    _main.WhiteAvailableMoves = WhiteMoves.Children.Count;
+                    WhiteTotalCount.Text = WhiteMoves.Children.Count.ToString();
+                }
+                else
+                {
+                    _main.BlackAvailableMoves = BlackMoves.Children.Count;
+                    BlackTotalCount.Text = BlackMoves.Children.Count.ToString();
+                }
+                _lastDecrementedMoveOwnerPlayer = null;
+            }
+
             if (playerKind == PlayerKind.White) //Black move is done
             {
-                if (BlackMoves.Children.Count > 0)
+                if (!isUndoneMove && BlackMoves.Children.Count > 0)
                 {
+                    _lastDecrementedMoveOwnerPlayer = PlayerKind.Black;
                     BlackMoves.Children.RemoveAt(0);
                     _main.BlackAvailableMoves = BlackMoves.Children.Count;
                     BlackTotalCount.Text = BlackMoves.Children.Count.ToString();
                 }
-                else
+                else if (!isUndoneMove)
                 {
                     if (!noAvailableMessageDisplayedForBlack)
                     {
@@ -143,6 +176,7 @@ namespace Othello
                     }
                     if (WhiteMoves.Children.Count > 0)
                     {
+                        _lastDecrementedMoveOwnerPlayer = PlayerKind.White;
                         WhiteMoves.Children.RemoveAt(0);
                         WhiteTotalCount.Text = WhiteMoves.Children.Count.ToString();
 
@@ -164,13 +198,14 @@ namespace Othello
             else
             {
                 //White move is done
-                if (WhiteMoves.Children.Count > 0)
+                if (!isUndoneMove && WhiteMoves.Children.Count > 0)
                 {
+                    _lastDecrementedMoveOwnerPlayer = PlayerKind.White;
                     WhiteMoves.Children.RemoveAt(0);
                     _main.WhiteAvailableMoves = WhiteMoves.Children.Count;
                     WhiteTotalCount.Text = WhiteMoves.Children.Count.ToString();
                 }
-                else 
+                else if (!isUndoneMove)
                 {
                     if (!noAvailableMessageDisplayedForWhite)
                     {
@@ -180,6 +215,7 @@ namespace Othello
 
                     if (BlackMoves.Children.Count > 0)
                     {
+                        _lastDecrementedMoveOwnerPlayer = PlayerKind.Black;
                         BlackMoves.Children.RemoveAt(0);
                         BlackTotalCount.Text = BlackMoves.Children.Count.ToString();
 

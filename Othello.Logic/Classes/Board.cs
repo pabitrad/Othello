@@ -73,8 +73,10 @@ namespace Othello.Logic.Classes
 
         public void UnDoMove(IMove move)
         {
-            if (move.IsPassMove)
+            if (move == null || move.IsPassMove)
+            {
                 return;
+            }
             Positions[move.MovePosition.Item1, move.MovePosition.Item2] = CellState.Empty;
             if (move.Player.PlayerKind == PlayerKind.Black)
             {

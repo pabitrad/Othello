@@ -64,8 +64,11 @@ namespace Othello.Logic.Classes
             IsPlaying = true;
             var nextMove = CurrentPlayerAtTurn.GetNextMove(Board);
 
-            if (nextMove == null)   //if can't move 
-                return; 
+            if (nextMove == null) //if can't move 
+            {
+                IsPlaying = false;
+                return;
+            } 
 
             if (nextMove.IsPassMove && HasPlayerPassed) //finish case
             {
@@ -114,15 +117,39 @@ namespace Othello.Logic.Classes
             RaiseMoveDone(new MoveEventArgs(nextMove));
         }
 
+        public void UndoLastMove() {
+            if (_lastMove == null || _lastMove.IsPassMove)
+            {
+                return;
+            }
+            Board.UnDoMove(_lastMove);
+
+            PlayerKind lastPlayerKind = _lastMove.Player.PlayerKind;
+            var previosPlayer = CurrentPlayerAtTurn;
+            if (lastPlayerKind == PlayerKind.White)
+            {
+                CurrentPlayerAtTurn = WhitePlayer;
+            }
+            else if (lastPlayerKind == PlayerKind.Black)
+            {
+                CurrentPlayerAtTurn = BlackPlayer;
+            }
+            else
+            {
+                throw new InvalidOperationException(string.Format("Unknown PlayerKind: {0}", lastPlayerKind));
+            }
+            if (previosPlayer != null)
+            {
+                previosPlayer.CancelNextMove();
+            }
+            RaiseMoveDone(new MoveEventArgs(_lastMove, true));
+            _lastMove = null;
+        }
+
         #region MoveDone
 
         public event EventHandler<MoveEventArgs> MoveDone;
         
-        public void RaiseUndoDone()
-        {
-            RaiseMoveDone(new MoveEventArgs(_lastMove));
-        }
-
         private void RaiseMoveDone(MoveEventArgs e)
         {
             EventHandler<MoveEventArgs> handler = MoveDone;

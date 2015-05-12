@@ -16,7 +16,6 @@ namespace Othello.Logic.Interfaces
         int WhiteAvailableMoves { get; set; }
         IMove LastMove { get; }
 
-        void RaiseUndoDone();
         bool GameStarted { get; set; }
         void StartGame();
         void ResetGame();
@@ -26,5 +25,6 @@ namespace Othello.Logic.Interfaces
         event EventHandler<MoveEventArgs> MoveDone;
         event EventHandler<GameFinishedEventArgs> GameFinished;
 
+        void UndoLastMove();
     }
 }

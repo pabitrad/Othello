@@ -36,6 +36,7 @@ namespace Othello.Logic.Classes.Players
         public PlayerKind PlayerKind { get; set; }
 
         public string PlayerName { get; set; }
+        public abstract void CancelNextMove();
 
         public abstract IMove GetNextMove(IBoard board);
 
