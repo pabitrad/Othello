@@ -26,7 +26,8 @@ namespace Othello
     {
         const int MOVE_COUNT = 40;
         MainViewModel _main = null;
-        string defaultPlayerName = string.Empty;
+        string defaultPlayerNameA = string.Empty;
+        string defaultPlayerNameB = string.Empty;
 
         BitmapImage activeBlackPlayer = new BitmapImage(new Uri("C:\\png\\turn_black.png"));
         BitmapImage activeWhitePlayer = new BitmapImage(new Uri("C:\\png\\turn_white.png"));
@@ -50,7 +51,7 @@ namespace Othello
         {
             addMoves();
 
-            defaultPlayerName = NamePlayerA.Text.Trim();
+            defaultPlayerNameA = PlayerA.Content.ToString().Trim();
         }
 
         private void addMoves()
@@ -84,16 +85,27 @@ namespace Othello
 
         public bool BeginGame()
         {
-            if (defaultPlayerName == NamePlayerA.Text.Trim())
+            if (defaultPlayerNameA == PlayerA.Content.ToString().Trim() || defaultPlayerNameB == PlayerB.Content.ToString().Trim())
             {
-                MessageBox.Show("Please enter name for Player A", "Othello");
-                return false;
+                //MessageBox.Show("Please enter name of Player A", "Othello");
+                //return false;
+                PlayerName playerName = null;
+
+                playerName = new PlayerName();
+                playerName.Owner = this;
+                playerName.WindowStartupLocation = WindowStartupLocation.CenterOwner;
+                bool? dialogResult = playerName.ShowDialog();
+                if (dialogResult.HasValue && dialogResult.Value)
+                {
+                    this.PlayerA.Content = playerName.PlayerA;
+                    this.PlayerB.Content = playerName.PlayerB;
+                }
             }
-            else if (defaultPlayerName == NamePlayerB.Text.Trim())
-            {
-                MessageBox.Show("Please enter name for Player B", "Othello");
-                return false;
-            }
+            //else if (defaultPlayerNameB == PlayerB.Content.ToString().Trim())
+            //{
+            //    MessageBox.Show("Please enter name of Player B", "Othello");
+            //    return false;
+            //}
 
             var main = DataContext as MainViewModel;
             if (_main != null)
@@ -294,8 +306,8 @@ namespace Othello
             btnHint.Content = "ENABLE HINT";
             _main.Hint = false;
 
-            NamePlayerA.Text = defaultPlayerName;
-            NamePlayerB.Text = defaultPlayerName;
+            //NamePlayerA.Text = defaultPlayerName;
+            //NamePlayerB.Text = defaultPlayerName;
 
             _main.NewGame();
         }
