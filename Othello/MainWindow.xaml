@@ -126,8 +126,10 @@
                 <Image x:Name="WhitePlayerPic" Height="80" Width="80" Stretch="Uniform" Source="C:\\png/white_noback.png" Visibility="Visible"/>
                 <Label Content="PLAYER A" Width="80" Margin="10, 10, 0,0" Background="LightGray" HorizontalContentAlignment="Center"/>
                 <Label Content="PLAYER B" Width="80" Margin="10, 10, 0,0" Background="LightGray" HorizontalContentAlignment="Center"/>
-                <TextBox Name="NamePlayerA" Text="TYPE IN YOUR NAME HERE" TextChanged="PlayerA_NameChanged" Foreground="Red" TextWrapping="Wrap" FontSize="10" Width="80"  Height="40" Margin="10, 10, 0,0"></TextBox>
-                <TextBox Name="NamePlayerB" Text="TYPE IN YOUR NAME HERE" TextChanged="PlayerB_NameChanged" Foreground="Red" TextWrapping="Wrap" FontSize="10" Width="80" Height="40" Margin="10, 10, 0,0"></TextBox>
+                <!--<TextBox Name="NamePlayerA" Text="TYPE IN YOUR NAME HERE" TextChanged="PlayerA_NameChanged" Foreground="Red" TextWrapping="Wrap" FontSize="10" Width="80"  Height="40" Margin="10, 10, 0,0"></TextBox>
+                <TextBox Name="NamePlayerB" Text="TYPE IN YOUR NAME HERE" TextChanged="PlayerB_NameChanged" Foreground="Red" TextWrapping="Wrap" FontSize="10" Width="80" Height="40" Margin="10, 10, 0,0"></TextBox>-->
+                <Label Content="Player_A Name" Name="PlayerA" Background="LightGray" Foreground="Brown" Width="83" Margin="10, 10, 0,0"></Label>
+                <Label Content="Player_B Name" Name="PlayerB" Background="LightGray" Foreground="Brown" Width="83" Margin="10, 10, 0,0"></Label>
                 <Label Content="SCORE CARD" Width="180" Margin="5, 5, 0,0" Background="LightGray" Foreground="Brown" HorizontalContentAlignment="Center"/>
                 <Label Content="Player A Count:" Width="120" Margin="0, 5, 0,0"/>
                 <TextBox Name="PlayerACount" Width="50" Margin="0, 5, 0,0" BorderThickness="2" BorderBrush="Black"></TextBox>
